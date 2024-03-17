@@ -1,0 +1,22 @@
+1) Запускаем бэк (index.js)    //done
+2) Настраиваем бд (postgres)   //done
+3) Создаём модели(user)        //done
+4) Cоздаём repositories        //done
+5) Создаём контролеры          //
+6) Создаём сервисы
+7) Описываем запросы в postman
+
+RESTAPI_POSTGRES/
+├── config/
+│   └── database.js            // Файл конфигурации для подключения к базе данных
+├── models/                    // Папка для моделей данных
+│   └── user.model.js          // Модель данных пользователя
+├── repo/
+│   └── file.repo.js           // Репозиторий для взаимодействия с базой данных
+├── service/
+│   └── file.service.js        // Сервис бизнес-логики
+├── controller/
+│   ├── post.controller.js     // Контроллер для обработки запросов REST API
+│   └── example.controller.js  // Пример контроллера для обработки других запросов
+├── app.js                     // Основной файл приложения Express.js
+└── package.json               // Файл зависимостей Node.js
