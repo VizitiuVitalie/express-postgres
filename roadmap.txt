@@ -1,10 +1,10 @@
-1) Запускаем бэк (index.js)    //done
-2) Настраиваем бд (postgres)   //done
-3) Создаём модели(user)        //done
-4) Cоздаём repositories        //done
-5) Создаём контролеры          //
-6) Создаём сервисы
-7) Описываем запросы в postman
+1) Запускаем бэк (index.js)     //done
+2) Настраиваем бд (postgres)    //done
+3) Создаём модели(user)         //done
+4) Cоздаём repositories         //done
+5) Создаём контролеры           //done
+6) Создаём сервисы              //done
+7) Описываем запросы в postman  //done
 
 RESTAPI_POSTGRES/
 ├── config/

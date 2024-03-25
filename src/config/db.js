@@ -8,10 +8,8 @@ const pool = new Pool({
   user: "postgres",
   password: "28uU1w6D",
   host: "localhost",
-  port: process.env.PORT || 4002,
+  port: process.env.DB_PORT,
   database: "pg_rest_practice",
-  idleTimeoutMillis: 0,
-  connectionTimeoutMillis: 0,
 });
 
 export default pool;
