@@ -1,8 +1,16 @@
+import {
+  StatusCodes,
+} from 'http-status-codes';
 import AccountRepo from "../repositories/account.repo.js";
 
 const AccountController = {
   async createAccount(req, res) {
-    await AccountRepo.createAccount(req, res);
+    try {
+      await AccountRepo.createAccount(req.body);
+    } catch (e) {
+      console.error("[AccountController.createAccount]: failed to create account")
+      return res.status(StatusCodes.BAD_REQUEST)
+    }
   },
 
   async getOneAccount(req, res) {
