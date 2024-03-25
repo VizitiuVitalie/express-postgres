@@ -1,12 +1,14 @@
 import pool from "../config/db.js";
+import hashPassword from "../utils/hashPassword.js";
 
 class AccountRepo {
   static async createAccount(req, res) {
     try {
       const { user_name, user_email, user_password } = req.body;
+      const hashedPassword = await hashPassword(user_password);
       const newAccount = await pool.query(
         `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
-        [user_name, user_email, user_password]
+        [user_name, user_email, hashedPassword]
       );
       if (newAccount.rows.length === 0) {
         return res.status(500).json({ error: "Failed to create account" });
