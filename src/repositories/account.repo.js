@@ -1,5 +1,4 @@
 import pool from "../config/db.js";
-import Account from "../models/account.model.js";
 
 export default class AccountRepo {
   static async createAccount(account) {
