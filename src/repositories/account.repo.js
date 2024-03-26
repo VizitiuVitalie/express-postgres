@@ -3,15 +3,15 @@ import Account from "../models/account.model.js";
 
 export default class AccountRepo {
   static async createAccount(account) {
-    const {user_name, user_email, user_password} = new Account(account)
-    account = await pool.query(
+    const { user_name, user_email, user_password } = account;
+    const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
       [user_name, user_email, user_password]
     );
-    if (account.rows.length === 0) {
-      throw new Error("cannot create new error");
+    if (result.rows.length === 0) {
+      throw new Error("Unable to create new account");
     }
-    return account.rows[0];
+    return result.rows[0];
   }
 
   static async getOneAccount(req, res) {

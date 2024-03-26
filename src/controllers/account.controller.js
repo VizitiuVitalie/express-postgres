@@ -4,6 +4,7 @@ export default class AccountController {
   static async createAccount(req, res) {
     try {
       await AccountRepo.createAccount(req.body);
+      return res.status(200).json({message: 'done'})
     } catch (error) {
       console.error("[AccountController.createAccount]:", error)
       return res.status(500)
