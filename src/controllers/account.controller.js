@@ -1,14 +1,16 @@
 import AccountRepo from "../repositories/account.repo.js";
+import AuthService from "../services/auth.service.js";
 
 export default class AccountController {
   static async createAccount(req, res) {
     try {
-      const { user_name, user_email, user_password } = req.body; // получаем данные учетной записи из тела запроса
-      await AccountRepo.createAccount({ user_name, user_email, user_password }); // передаем данные учетной записи
+      const { user_name, user_email, user_password } = req.body;
+      console.log(req.body);
+      await AuthService.register({ name: user_name, email: user_email, password: user_password });
       return res.status(200).json({ message: "done" });
     } catch (error) {
       console.error("[AccountController.createAccount]:", error);
-      return res.status(500).json({ error: error.message }); // возвращаем ошибку в виде JSON
+      return res.status(500).json({ error: error.message });
     }
   }
 
