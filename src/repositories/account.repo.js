@@ -2,10 +2,10 @@ import pool from "../config/db.js";
 
 export default class AccountRepo {
   static async createAccount(account) {
-    const { user_name, user_email, user_password } = account;
+    console.log(account);
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
-      [user_name, user_email, user_password]
+      [account.user_name, account.user_email, account.user_password]
     );
     if (result.rows.length === 0) {
       throw new Error("Unable to create new account");
@@ -13,24 +13,14 @@ export default class AccountRepo {
     return result.rows[0];
   }
 
-  static async getOneAccount(req, res) {
-    try {
-      const { user_id } = req.params;
-      const oneAccount = await pool.query(
-        `SELECT * FROM accounts WHERE user_id = $1`,
-        [user_id]
-      );
-      if (oneAccount.rows.length === 0) {
-        return res
-          .status(404)
-          .json({ error: "Account with specified ID not found" });
-      }
-      res.status(200).json(oneAccount.rows[0] || {});
-    } catch (error) {
-      console.error("Error getting account:", error);
-      res
-        .status(500)
-        .json({ error: "Internal Server Error while getting account" });
+  static async getOneAccount(account) {
+    const { user_id } = account;
+    const oneAccount = await pool.query(
+      `SELECT * FROM accounts WHERE user_id = $1`,
+      [user_id]
+    );
+    if (oneAccount.rows.length === 0) {
+      throw new Error("Cannot get account by id")
     }
   }
 
