@@ -1,19 +1,16 @@
-import { hashPassword } from "../utils/hashPassword";
-import AccountController from "../controllers/account.controller";
-import AccountRepo from "../repositories/account.repo";
-import Account from "../models/account.model";
+import Account from '../models/account.model.js';
+import AccountRepo from '../repositories/account.repo.js';
+import { hashPassword } from '../utils/hashPassword.js';
 
 export default class AuthService {
-    static async register(accountData) {
-        const { user_name, user_email, user_password } = accountData;
+    static async register(account) {
+        const hashedPassword = await hashPassword(account.password);
 
-        const hashedPassword = await hashPassword(user_password);
+        const entity = new Account(0, account.name, account.email, hashedPassword)
 
-        const newAccount = new Account(user_name, user_email, hashedPassword)
+        await AccountRepo.createAccount(entity);
 
-        await AccountController.createAccount(newAccount);
-
-        return { user_name, user_email };
+        return entity.toDTO()
     }
 
     static async login() {

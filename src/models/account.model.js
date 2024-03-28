@@ -5,4 +5,12 @@ export default class Account {
         this.user_email = email;
         this.user_password = password;
     }
+
+    toDTO() {
+        return {
+            user_id: this.user_id,
+            user_name: this.user_name,
+            user_email: this.user_email,
+        }
+    }
 }

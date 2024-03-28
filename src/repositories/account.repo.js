@@ -2,7 +2,6 @@ import pool from "../config/db.js";
 
 export default class AccountRepo {
   static async createAccount(account) {
-    console.log(account);
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
       [account.user_name, account.user_email, account.user_password]

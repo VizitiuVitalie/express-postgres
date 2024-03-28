@@ -4,12 +4,6 @@ const { Pool } = pg;
 
 dotenv.config();
 
-const pool = new Pool({
-  user: "postgres",
-  password: "28uU1w6D",
-  host: "localhost",
-  port: process.env.DB_PORT,
-  database: "pg_rest_practice",
-});
+const pool = {};
 
 export default pool;
