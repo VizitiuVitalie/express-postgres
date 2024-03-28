@@ -1,6 +1,6 @@
-import pool from "../config/db.js";
+import { pool } from "../config/db.js";
 
-export default class AccountRepo {
+export class AccountRepo {
   static async createAccount(account) {
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
@@ -19,7 +19,7 @@ export default class AccountRepo {
       [user_id]
     );
     if (oneAccount.rows.length === 0) {
-      throw new Error("Cannot get account by id")
+      throw new Error("Cannot get account by id");
     }
   }
 
