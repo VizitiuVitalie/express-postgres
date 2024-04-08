@@ -1,28 +1,3 @@
-<<<<<<< HEAD
-import pool from "../config/db.js";
-
-export default class AccountRepo {
-  static async createAccount(account) {
-    console.log(account);
-    const result = await pool.query(
-      `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
-      [account.name, account.email, account.password]
-    );
-    if (result.rows.length === 0) {
-      throw new Error("Unable to create new account");
-    }
-    return result.rows[0];
-  }
-
-  static async getOneAccount(account) {
-    const { user_id } = account;
-    const oneAccount = await pool.query(
-      `SELECT * FROM accounts WHERE user_id = $1`,
-      [user_id]
-    );
-    if (oneAccount.rows.length === 0) {
-      throw new Error("Cannot get account by id")
-=======
 import { pool } from "../config/db.js";
 import { Account } from "../models/account.model.js";
 
@@ -46,7 +21,6 @@ export class AccountRepo {
     );
     if (result.rows.length === 0) {
       throw new Error("Cannot find account by id: " + id);
->>>>>>> unstable
     }
     return new Account(
       result.rows[0].user_id,

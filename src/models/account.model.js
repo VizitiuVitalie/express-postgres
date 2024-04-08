@@ -1,15 +1,9 @@
-<<<<<<< HEAD
-export default class Account {
-=======
 export class Account {
->>>>>>> unstable
     constructor(id, name, email, password) {
         this.user_id = id
         this.user_name = name;
         this.user_email = email;
         this.user_password = password;
-<<<<<<< HEAD
-=======
     }
 
     toDTO() {
@@ -18,6 +12,5 @@ export class Account {
             user_name: this.user_name,
             user_email: this.user_email,
         }
->>>>>>> unstable
     }
 }

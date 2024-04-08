@@ -1,15 +1,3 @@
-<<<<<<< HEAD
-import AccountRepo from "../repositories/account.repo.js";
-import AuthService from "../services/auth.service.js";
-
-export default class AccountController {
-  static async createAccount(req, res) {
-    try {
-      const { user_name, user_email, user_password } = req.body;
-      console.log(req.body);
-      await AuthService.register({ name: user_name, email: user_email, password: user_password });
-      return res.status(200).json({ message: "done" });
-=======
 import { AccountRepo } from "../repositories/account.repo.js";
 import { AuthService } from "../services/auth.service.js";
 
@@ -24,34 +12,12 @@ export class AccountController {
       });
       console.log("controller: ", newAccount);
       return res.status(200).json(newAccount);
->>>>>>> unstable
     } catch (error) {
       console.error("[AccountController.createAccount]:", error);
       return res.status(500).json({ error: error.message });
     }
   }
 
-<<<<<<< HEAD
-  static async getOneAccount(req, res) {
-    const { user_id } = req.params;
-    await AccountRepo.getOneAccount();
-  }
-
-  static async getAllAccounts(req, res) {
-    await AccountRepo.getAllAccounts(req, res);
-  }
-
-  static async updateAccount(req, res) {
-    await AccountRepo.updateAccount(req, res);
-  }
-
-  static async deleteAllAccounts(req, res) {
-    await AccountRepo.deleteAllAccounts(req, res);
-  }
-
-  static async deleteOneAccount(req, res) {
-    await AccountRepo.deleteOneAccount(req, res);
-=======
   static async findById(req, res) {
     try {
       const { user_id } = req.params;
@@ -102,6 +68,5 @@ export class AccountController {
       console.error("[AccountController.deleteOneAccount]:", error);
       return res.status(500).json({ error: error.message });
     }
->>>>>>> unstable
   }
 }
