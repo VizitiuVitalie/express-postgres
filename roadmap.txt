@@ -8,7 +8,10 @@
 8) Чистим репо без trycatch and without use hash function and use only model account. At return - созданная модель new Account.
 9) Создать auth сервис с методами register, login, logout. (trycatch error cannot register).
 10) Controller - обработка ошибок trycath и взаимоействие с сервисом.
+<<<<<<< HEAD
 
+=======
+>>>>>>> unstable
 
 RESTAPI_POSTGRES/
 ├── config/
