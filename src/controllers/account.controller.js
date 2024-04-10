@@ -34,6 +34,7 @@ export class AccountController {
     }
   }
 
+
   static async deleteOneAccount(req, res) {
     try {
       const { user_id } = req.params;
@@ -50,8 +51,9 @@ export class AccountController {
       const deletedAccounts = await AccountRepo.deleteAllAccounts();
       return res.status(200).json(deletedAccounts);
     } catch (error) {
-      console.error("[AccountController.deleteAllAccount]:", error);
+      console.error("[AccountController.deleteAllAccounts]:", error);
       return res.status(500).json({ error: error.message });
     }
   }
+  
 }
