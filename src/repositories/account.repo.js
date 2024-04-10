@@ -30,6 +30,22 @@ export class AccountRepo {
     ).toDTO();
   }
 
+  static async findByEmail(email) {
+    const result = await pool.query(
+      `SELECT * FROM accounts WHERE user_email = $1`,
+      [email]
+    );
+    if (result.rows.length === 0) {
+      throw new Error("Incorrect email or password");
+    }
+    return new Account(
+      result.rows[0].user_id,
+      result.rows[0].user_name,
+      result.rows[0].user_email,
+      result.rows[0].user_password
+    )
+  }
+
   static async findAllAccounts() {
     const result = await pool.query(`SELECT * FROM accounts`);
     if (result.rows.length === 0) {
@@ -91,6 +107,6 @@ export class AccountRepo {
       result.rows[0].user_name,
       result.rows[0].user_email,
       result.rows[0].user_password
-    ).toDTO()
+    ).toDTO();
   }
 }

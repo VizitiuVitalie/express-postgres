@@ -1,6 +1,7 @@
 import { Account } from "../models/account.model.js";
 import { AccountRepo } from "../repositories/account.repo.js";
 import { hashPassword } from "../utils/hashPassword.js";
+import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
 
 export class AuthService {
   //register
@@ -26,7 +27,18 @@ export class AuthService {
 
   //login
   static async login(email, password) {
-    const hashedPassword = await hashPassword(password);
+    const account = await AccountRepo.findByEmail(email);
+    if (!account) {
+      throw new Error("Invalid email or password");
+    }
+    const passwordMatch = await verifyPassword(password, account.user_password);
+    if (!passwordMatch) {
+      throw new Error("Invalid email or password");
+    }
+    const accessToken = generateAccessToken(account);
+    const refreshToken = generateRefreshToken(account);
+
+    return { accessToken, refreshToken, account };
   }
 
   //logout

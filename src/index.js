@@ -1,6 +1,7 @@
 import express from "express";
 import dotenv from "dotenv";
 import { accountRouter } from "./routers/account.router.js";
+import { authRouter } from "./routers/auth.router.js";
 
 dotenv.config();
 
@@ -9,6 +10,7 @@ const app = express();
 
 app.use(express.json());
 
+app.use("/api", authRouter);
 app.use("/api", accountRouter);
 
 app.listen(PORT, () => {
