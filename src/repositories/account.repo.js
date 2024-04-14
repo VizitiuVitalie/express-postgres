@@ -35,15 +35,11 @@ export class AccountRepo {
       `SELECT * FROM accounts WHERE user_email = $1`,
       [email]
     );
+    console.log(result.rows[0]);
     if (result.rows.length === 0) {
       throw new Error("Incorrect email or password");
     }
-    return new Account(
-      result.rows[0].user_id,
-      result.rows[0].user_name,
-      result.rows[0].user_email,
-      result.rows[0].user_password
-    )
+    return result.rows[0];
   }
 
   static async findAllAccounts() {

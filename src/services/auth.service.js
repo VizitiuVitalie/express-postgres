@@ -2,6 +2,7 @@ import { Account } from "../models/account.model.js";
 import { AccountRepo } from "../repositories/account.repo.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
+import { verifyPassword } from "../utils/verifyPassword.js";
 
 export class AuthService {
   //register
@@ -26,19 +27,40 @@ export class AuthService {
   }
 
   //login
-  static async login(email, password) {
-    const account = await AccountRepo.findByEmail(email);
-    if (!account) {
+  static async login(account) {
+    const entity = new Account(
+      null,
+      null,
+      account.email,
+      account.password,
+    );
+    const findedByEmail = await AccountRepo.findByEmail(entity.user_email);
+    if (!findedByEmail) {
       throw new Error("Invalid email or password");
     }
-    const passwordMatch = await verifyPassword(password, account.user_password);
+    const passwordMatch = await verifyPassword(
+      entity.user_password,
+      findedByEmail.user_password
+    );
     if (!passwordMatch) {
       throw new Error("Invalid email or password");
     }
-    const accessToken = generateAccessToken(account);
-    const refreshToken = generateRefreshToken(account);
+    const accessToken = generateAccessToken(entity.toDTO());
+    const refreshToken = generateRefreshToken(entity.toDTO());
 
-    return { accessToken, refreshToken, account };
+    localStorage.setItem('accessToken', accessToken);
+    localStorage.setItem('refreshToken', refreshToken);
+
+    return {
+      user: new Account(
+        findedByEmail.user_id,
+        findedByEmail.user_name,
+        findedByEmail.user_email,
+        findedByEmail.user_password
+      ).toDTO(),
+      accessToken: accessToken,
+      refreshToken: refreshToken
+    };
   }
 
   //logout
