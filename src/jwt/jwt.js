@@ -1,9 +1,8 @@
 import jwt from "jsonwebtoken";
-import axios from "axios";
 
 export function generateAccessToken(user) {
   return jwt.sign(user, `${process.env.ACCESS_TOKEN_SECRET}`, {
-    expiresIn: "1m",
+    expiresIn: "5m",
   });
 }
 
@@ -14,5 +13,5 @@ export function generateRefreshToken(user) {
 }
 
 export function refreshAccessToken(refreshToken) {
- 
+
 }

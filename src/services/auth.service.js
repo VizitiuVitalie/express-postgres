@@ -28,38 +28,31 @@ export class AuthService {
 
   //login
   static async login(account) {
-    const entity = new Account(
-      null,
-      null,
-      account.email,
-      account.password,
-    );
-    const findedByEmail = await AccountRepo.findByEmail(entity.user_email);
+    const findedByEmail = await AccountRepo.findByEmail(account.email);
     if (!findedByEmail) {
       throw new Error("Invalid email or password");
     }
     const passwordMatch = await verifyPassword(
-      entity.user_password,
+      account.password,
       findedByEmail.user_password
     );
     if (!passwordMatch) {
       throw new Error("Invalid email or password");
     }
-    const accessToken = generateAccessToken(entity.toDTO());
-    const refreshToken = generateRefreshToken(entity.toDTO());
 
-    localStorage.setItem('accessToken', accessToken);
-    localStorage.setItem('refreshToken', refreshToken);
+    const loggedUser = new Account(
+      findedByEmail.user_id,
+      findedByEmail.user_name,
+      findedByEmail.user_email
+    ).toDTO();
+
+    const accessToken = generateAccessToken(loggedUser);
+    const refreshToken = generateRefreshToken(loggedUser);
 
     return {
-      user: new Account(
-        findedByEmail.user_id,
-        findedByEmail.user_name,
-        findedByEmail.user_email,
-        findedByEmail.user_password
-      ).toDTO(),
+      user: loggedUser,
       accessToken: accessToken,
-      refreshToken: refreshToken
+      refreshToken: refreshToken,
     };
   }
 
