@@ -35,7 +35,6 @@ export class AccountRepo {
       `SELECT * FROM accounts WHERE user_email = $1`,
       [email]
     );
-    console.log(result.rows[0]);
     if (result.rows.length === 0) {
       throw new Error("Incorrect email or password");
     }
