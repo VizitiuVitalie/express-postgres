@@ -25,6 +25,7 @@ export class AuthController {
         email: user_email,
         password: user_password,
       });
+      
       return res.status(200).json(getTokensForUser);
     } catch (error) {
       console.error("[AuthController.login]:", error);
