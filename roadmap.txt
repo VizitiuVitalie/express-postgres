@@ -1,25 +1,30 @@
-1) Запускаем бэк (index.js)     //done
-2) Настраиваем бд (postgres)    //done
-3) Создаём модели(user)         //done
-4) Cоздаём repositories         //done
-5) Создаём контролеры           //done
-6) Создаём сервисы              //done
-7) Описываем запросы в postman  //done
-8) Чистим репо без trycatch and without use hash function and use only model account. At return - созданная модель new Account.
-9) Создать auth сервис с методами register, login, logout. (trycatch error cannot register).
-10) Controller - обработка ошибок trycath и взаимоействие с сервисом.
+TODO: 
+1) Create function refreshAccessToken in jwt.js;
+
 
 RESTAPI_POSTGRES/
 ├── config/
-│   └── database.js            // Файл конфигурации для подключения к базе данных
-├── models/                    // Папка для моделей данных
-│   └── user.model.js          // Модель данных пользователя
-├── repo/
-│   └── file.repo.js           // Репозиторий для взаимодействия с базой данных
-├── service/
-│   └── file.service.js        // Сервис бизнес-логики
-├── controller/
-│   ├── post.controller.js     // Контроллер для обработки запросов REST API
-│   └── example.controller.js  // Пример контроллера для обработки других запросов
-├── app.js                     // Основной файл приложения Express.js
-└── package.json               // Файл зависимостей Node.js
+│   └── db.js                       // Подключение к бд (pool = new Pool)
+│   └── db.sql                      // Описание sql таблиц
+├── controllers/
+│   └── account.controller.js       // Вытаскиваем из req.params данные при запросе + отлов ошибок
+│   └── auth.controller.js          // Здесь так же только методы отвечающие за аутентификацию (createAccount, login, logout)
+├── jwt/
+│   └── jwt.js                      // Функции генерации acccess, refresh token-ов а так же функция обновления access token-а с помощью refresh token-а 
+├── middlewares
+│   └── auth.middlewares.js         // Мидлвар аутентификации запросов проверяя наличие и правильность jwt токена в заголовках HTTP-запросов
+├── models/
+│   └── account.model.js            // Модель аккаунта и метод toDTO который возвращает не конфиденциальные данные
+│   └── session.model.js            // Модель сессии которая содержит(session_id, user_id, access_token, refresh_token, expires_at)
+├── repositories/
+│   └── account.repo.js             // Слой взаимодействия с бд
+├── routers/
+│   └── account.router.js           // Слой для описания маршрутов для аутентифицированных пользователей
+│   └── auth.router.js              // Маршруты аутентификации (.post - createAccount; .get - login)
+├── services/
+│   └── auth.service.js             // Слой бизнес-логики (хеширование паролей, создание сущности аккаунта и т.д)
+├── utils/
+│   └── hashPassword.js             // Функция хеширования паролей
+│   └── verifyPassword.js           // Функция сравнения вводимого пароля с хешированным паролем из бд
+├── index.js                        // Основной файл
+├── .env                            // Тут секретные данные, такие как: ACCESS_SECRET_KEY, REFRESH_SECRET_KEY для генерации jwt, PORT и DB_PORT

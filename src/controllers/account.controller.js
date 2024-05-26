@@ -2,7 +2,7 @@ import { AccountRepo } from "../repositories/account.repo.js";
 import { AuthService } from "../services/auth.service.js";
 
 export class AccountController {
-
+  
   static async findById(req, res) {
     try {
       const { user_id } = req.params;
@@ -34,7 +34,6 @@ export class AccountController {
     }
   }
 
-
   static async deleteOneAccount(req, res) {
     try {
       const { user_id } = req.params;
@@ -55,5 +54,4 @@ export class AccountController {
       return res.status(500).json({ error: error.message });
     }
   }
-  
 }

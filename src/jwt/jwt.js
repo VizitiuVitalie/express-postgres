@@ -12,4 +12,10 @@ export function generateRefreshToken(user) {
   });
 }
 
-export function refreshAccessToken(refreshToken) {}
+export function refreshAccessToken(refreshToken) {
+  try {
+    
+  } catch (error) {
+    
+  }
+}
