@@ -1,5 +1,6 @@
 import { Account } from "../models/account.model.js";
 import { AccountRepo } from "../repositories/account.repo.js";
+import { SessionRepo } from "../repositories/session.repo.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
@@ -17,13 +18,28 @@ export class AuthService {
     );
 
     const savedAccount = await AccountRepo.createAccount(entity);
-    console.log("service:", savedAccount);
-    return new Account(
+    console.log("auth_service:", savedAccount);
+
+    const registeredUser = new Account(
       savedAccount.user_id,
       savedAccount.user_name,
       savedAccount.user_email,
       savedAccount.user_password
     ).toDTO();
+
+    const accessToken = generateAccessToken(registeredUser);
+    const refreshToken = generateRefreshToken(registeredUser);
+
+    const savedSession = await SessionRepo.createSession(
+      registeredUser.user_id,
+      accessToken,
+      refreshToken
+    );
+
+    return {
+      user: registeredUser,
+      session: savedSession,
+    };
   }
 
   //login
@@ -43,16 +59,32 @@ export class AuthService {
     const loggedUser = new Account(
       findedByEmail.user_id,
       findedByEmail.user_name,
-      findedByEmail.user_email
+      findedByEmail.user_email,
+      findedByEmail.user_password
     ).toDTO();
+
+    const existingSession = await SessionRepo.findSessionByUserId(
+      loggedUser.user_id
+    );
+    if (existingSession) {
+      return {
+        user: loggedUser,
+        session: existingSession,
+      };
+    }
 
     const accessToken = generateAccessToken(loggedUser);
     const refreshToken = generateRefreshToken(loggedUser);
 
+    const savedSession = await SessionRepo.createSession(
+      loggedUser.user_id,
+      accessToken,
+      refreshToken
+    );
+
     return {
       user: loggedUser,
-      accessToken: accessToken,
-      refreshToken: refreshToken,
+      session: savedSession
     };
   }
 
