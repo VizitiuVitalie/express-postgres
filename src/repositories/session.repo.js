@@ -17,9 +17,17 @@ export class SessionRepo {
       `SELECT * FROM session_tokens WHERE user_id = $1`,
       [user_id]
     );
-    if (result.rows[0].length === 0) {
+    if (result.rows.length === 0) {
       throw new Error("Unable to find session by user_id");
     }
+    return result.rows[0];
+  }
+
+  static async deleteSessionByUserId(user_id) {
+    const result = await pool.query(
+      `DELETE FROM session_tokens WHERE user_id = $1`,
+      [user_id]
+    );
     return result.rows[0];
   }
 }

@@ -44,34 +44,32 @@ export class AuthService {
 
   //login
   static async login(account) {
-    const findedByEmail = await AccountRepo.findByEmail(account.email);
-    if (!findedByEmail) {
+    const foundByEmail = await AccountRepo.findByEmail(account.email);
+    if (!foundByEmail) {
       throw new Error("Invalid email or password");
     }
     const passwordMatch = await verifyPassword(
       account.password,
-      findedByEmail.user_password
+      foundByEmail.user_password
     );
     if (!passwordMatch) {
       throw new Error("Invalid email or password");
     }
 
-    const loggedUser = new Account(
-      findedByEmail.user_id,
-      findedByEmail.user_name,
-      findedByEmail.user_email,
-      findedByEmail.user_password
-    ).toDTO();
-
-    const existingSession = await SessionRepo.findSessionByUserId(
-      loggedUser.user_id
+    const foundSession = await SessionRepo.findSessionByUserId(
+      foundByEmail.user_id
     );
-    if (existingSession) {
-      return {
-        user: loggedUser,
-        session: existingSession,
-      };
+
+    if (foundSession) {
+      await SessionRepo.deleteSessionByUserId(foundSession.user_id);
     }
+
+    const loggedUser = new Account(
+      foundByEmail.user_id,
+      foundByEmail.user_name,
+      foundByEmail.user_email,
+      foundByEmail.user_password
+    ).toDTO();
 
     const accessToken = generateAccessToken(loggedUser);
     const refreshToken = generateRefreshToken(loggedUser);
@@ -84,7 +82,7 @@ export class AuthService {
 
     return {
       user: loggedUser,
-      session: savedSession
+      session: savedSession,
     };
   }
 

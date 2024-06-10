@@ -2,7 +2,7 @@ import jwt from "jsonwebtoken";
 
 export function generateAccessToken(user) {
   return jwt.sign(user, `${process.env.ACCESS_SECRET_KEY}`, {
-    expiresIn: "5m",
+    expiresIn: "2m",
   });
 }
 
