@@ -1,4 +1,4 @@
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 
 export function authenticateToken(req, res, next) {
   const authHeader = req.headers["authorization"];
@@ -13,6 +13,6 @@ export function authenticateToken(req, res, next) {
       return res.status(403).json({ error: "No access: token is not valid" });
     }
     req.user = user;
-    next()
+    next();
   });
 }

@@ -5,3 +5,4 @@ export const authRouter = express.Router();
 
 authRouter.post("/register", AuthController.createAccount);
 authRouter.get("/login", AuthController.login);
+authRouter.delete("/logout", AuthController.logout)

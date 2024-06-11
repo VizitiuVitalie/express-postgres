@@ -87,7 +87,10 @@ export class AuthService {
   }
 
   //logout
-  static async logout() {}
+  static async logout(user_id) {
+    const deletedSession = await SessionRepo.deleteSessionByUserId(user_id);
+    return deletedSession;
+  }
 
   //update
   static async update(account) {
