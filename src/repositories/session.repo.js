@@ -20,6 +20,17 @@ export class SessionRepo {
     return result.rows[0];
   }
 
+  static async updateSessionTokens(user_id, newAccessToken, newRefreshToken) {
+    await pool.query(
+      `UPDATE session_tokens SET access_token = $1, refresh_token = $2 WHERE user_id = $3 RETURNING *`,
+      [newAccessToken, newRefreshToken, user_id]
+    );
+    if (result.rows[0].length === 0) {
+      throw new Error("Unable to update tokens in session");
+    }
+    return result.rows[0];
+  }
+
   static async deleteSessionByUserId(user_id) {
     const result = await pool.query(
       `DELETE FROM session_tokens WHERE user_id = $1`,

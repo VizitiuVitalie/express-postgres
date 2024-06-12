@@ -4,6 +4,10 @@ import { SessionRepo } from "../repositories/session.repo.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
+import dotenv from "dotenv";
+
+dotenv.config();
+
 
 export class AuthService {
   //register
@@ -90,6 +94,31 @@ export class AuthService {
   static async logout(user_id) {
     const deletedSession = await SessionRepo.deleteSessionByUserId(user_id);
     return deletedSession;
+  }
+
+  static async refreshTokens(user_id, oldRefreshToken) {
+    const session = SessionRepo.findSessionByUserId(user_id);
+    if (!session) {
+      throw new Error("Session not found");
+    }
+    console.log("[OldRefreshToken]: ", oldRefreshToken);
+    console.log("[REFRESH_SECRET_KEY]: ", process.env.REFRESH_SECRET_KEY);
+    try {
+      jwt.verify(oldRefreshToken, process.env.REFRESH_SECRET_KEY, { algorithms: ['HS256'] });
+    } catch (error) {
+      throw new Error("Invalid refresh token");
+    }
+
+    const newAccessToken = generateAccessToken(session);
+    const newRefreshToken = generateRefreshToken(session);
+
+    const updatedSession = await SessionRepo.updateSessionTokens(
+      user_id,
+      newAccessToken,
+      newRefreshToken
+    );
+
+    return updatedSession;
   }
 
   //update

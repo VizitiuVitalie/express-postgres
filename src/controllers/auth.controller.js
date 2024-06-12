@@ -42,4 +42,15 @@ export class AuthController {
       return res.status(500).json({ error: error.message });
     }
   }
+
+  static async refreshTokens(req, res) {
+    try {
+      const { user_id, refresh_token } = req.body;
+      const newTokens = await AuthService.refreshTokens(user_id, refresh_token);
+      return res.status(200).json(newTokens);
+    } catch (error) {
+      console.error("[AuthController.refreshTokens]:", error);
+      return res.status(500).json({ error: error.message });
+    }
+  }
 }
