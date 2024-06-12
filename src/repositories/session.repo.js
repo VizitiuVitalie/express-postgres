@@ -21,7 +21,7 @@ export class SessionRepo {
   }
 
   static async updateSessionTokens(user_id, newAccessToken, newRefreshToken) {
-    await pool.query(
+    const result = await pool.query(
       `UPDATE session_tokens SET access_token = $1, refresh_token = $2 WHERE user_id = $3 RETURNING *`,
       [newAccessToken, newRefreshToken, user_id]
     );

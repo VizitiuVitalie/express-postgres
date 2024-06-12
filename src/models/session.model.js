@@ -5,4 +5,11 @@ export class Session {
     this.access_token = accessToken;
     this.refresh_token = refreshToken;
   }
+
+  toDTO() {
+    return {
+      session_id: this.session_id,
+      user_id: this.user_id,
+    };
+  }
 }

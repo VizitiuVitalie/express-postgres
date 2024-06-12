@@ -1,13 +1,14 @@
 import { Account } from "../models/account.model.js";
+import { Session } from "../models/session.model.js";
 import { AccountRepo } from "../repositories/account.repo.js";
 import { SessionRepo } from "../repositories/session.repo.js";
 import { hashPassword } from "../utils/hashPassword.js";
 import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
 import { verifyPassword } from "../utils/verifyPassword.js";
 import dotenv from "dotenv";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
-
 
 export class AuthService {
   //register
@@ -97,20 +98,32 @@ export class AuthService {
   }
 
   static async refreshTokens(user_id, oldRefreshToken) {
-    const session = SessionRepo.findSessionByUserId(user_id);
-    if (!session) {
+    const foundSession = await SessionRepo.findSessionByUserId(user_id);
+    console.log(`[foundSession]: `, foundSession);
+    if (!foundSession) {
       throw new Error("Session not found");
     }
-    console.log("[OldRefreshToken]: ", oldRefreshToken);
+    console.log("[oldRefreshToken]: ", oldRefreshToken);
     console.log("[REFRESH_SECRET_KEY]: ", process.env.REFRESH_SECRET_KEY);
     try {
-      jwt.verify(oldRefreshToken, process.env.REFRESH_SECRET_KEY, { algorithms: ['HS256'] });
+      jwt.verify(oldRefreshToken, "" + process.env.REFRESH_SECRET_KEY, {
+        algorithms: ["HS256"],
+      });
     } catch (error) {
       throw new Error("Invalid refresh token");
     }
 
+    const session = new Session(
+      foundSession.session_id,
+      foundSession.user_id,
+      foundSession.access_token,
+      foundSession.refresh_token
+    ).toDTO();
+
     const newAccessToken = generateAccessToken(session);
     const newRefreshToken = generateRefreshToken(session);
+    console.log(newAccessToken);
+    console.log(newRefreshToken);
 
     const updatedSession = await SessionRepo.updateSessionTokens(
       user_id,
