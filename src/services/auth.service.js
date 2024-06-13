@@ -97,6 +97,7 @@ export class AuthService {
     return deletedSession;
   }
 
+  //refresh
   static async refreshTokens(user_id, oldRefreshToken) {
     const foundSession = await SessionRepo.findSessionByUserId(user_id);
     console.log(`[foundSession]: `, foundSession);
