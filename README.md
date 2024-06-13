@@ -55,13 +55,13 @@ This project demonstrates how to build a RESTful API using Node.js and PostgreSQ
 
 3. **Configure PostgreSQL:**
 
-- **Create a PostgreSQL database**
-- **Connect to your database and insert commands from config/db.sql**
+- Create a PostgreSQL database
+- Connect to your database and insert commands from config/db.sql
 
 4. **Set up env variables:**
 
-- **Create a `.env` file in the root directory.**
-- **Add the following variables:**
+- Create a `.env` file in the root directory.
+- Add the following variables:
 ```makefile
 ACCESS_SECRET_KEY=your_access_secret_key
 REFRESH_SECRET_KEY=your_refresh_secret_key
