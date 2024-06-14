@@ -88,11 +88,11 @@ export class AccountRepo {
   }
 
   static async accountToDelete(id) {
-    const accountToDelete = await pool.query(
+    const account = await pool.query(
       `SELECT * FROM accounts WHERE user_id = $1`,
       [id]
     );
-    if (accountToDelete.rows.length === 0) {
+    if (account.rows.length === 0) {
       return new Error(`Filed to find account by id: ${id}`);
     }
     const result = await pool.query(
