@@ -38,7 +38,7 @@ export class SessionRepo {
     return result.rows[0];
   }
 
-  static async deleteByUserId(user_id) {
+  static async deleteAllByUserId(user_id) {
     const result = await pool.query(
       `DELETE FROM session_tokens WHERE user_id = $1`,
       [user_id]

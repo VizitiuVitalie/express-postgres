@@ -81,12 +81,12 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    const foundSession = await SessionRepo.findSessionByUserId(
+    const foundSession = await SessionRepo.findByUserId(
       foundAccount.user_id
     );
 
     if (foundSession) {
-      await SessionRepo.deleteByUserId(foundSession.user_id);
+      await SessionRepo.deleteAllByUserId(foundSession.user_id);
     }
 
     const loggedAccount = new Account(
@@ -113,7 +113,7 @@ export class AuthService {
 
   //logout
   static async logout(user_id) {
-    return SessionRepo.deleteByUserId(user_id)
+    return SessionRepo.deleteAllByUserId(user_id)
   }
 
   //refresh
