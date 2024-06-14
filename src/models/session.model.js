@@ -1,6 +1,6 @@
 export class Session {
-  constructor(sessionId, userId, accessToken, refreshToken) {
-    this.session_id = sessionId;
+  constructor({ sessionId, userId, accessToken, refreshToken }) {
+    this.id = sessionId;
     this.user_id = userId;
     this.access_token = accessToken;
     this.refresh_token = refreshToken;
@@ -8,7 +8,7 @@ export class Session {
 
   toDTO() {
     return {
-      session_id: this.session_id,
+      id: this.id,
       user_id: this.user_id,
     };
   }

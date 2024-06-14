@@ -10,9 +10,9 @@ const app = express();
 
 app.use(express.json());
 
-app.use("/api", authRouter);
-app.use("/api", accountRouter);
+app.use("/api/auth", authRouter);
+app.use("/api/accounts", accountRouter);
 
 app.listen(PORT, () => {
-  console.log(`API is listening on port ${PORT}`);
+  console.log(`app is listening on port ${PORT}`);
 });

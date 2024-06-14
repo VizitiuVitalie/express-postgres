@@ -2,40 +2,60 @@ import { Account } from "../models/account.model.js";
 import { Session } from "../models/session.model.js";
 import { AccountRepo } from "../repositories/account.repo.js";
 import { SessionRepo } from "../repositories/session.repo.js";
-import { hashPassword } from "../utils/hashPassword.js";
-import { generateAccessToken, generateRefreshToken } from "../jwt/jwt.js";
-import { verifyPassword } from "../utils/verifyPassword.js";
-import dotenv from "dotenv";
+import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 
-dotenv.config();
-
 export class AuthService {
+
+  //utils
+  static #hashPassword(password) {
+    const saltRounds = 10;
+    return hash(password, saltRounds);
+  }
+
+  static #verifyPassword(password, hashedPassword) {
+    return compare(password, hashedPassword);
+  }
+
+  static #generateAccessToken(user) {
+    return sign(user, `${process.env.ACCESS_SECRET_KEY}`, {
+      algorithm: "HS256",
+      expiresIn: "10m",
+    });
+  }
+
+  static #generateRefreshToken(user) {
+    return sign(user, `${process.env.REFRESH_SECRET_KEY}`, {
+      algorithm: "HS256",
+      expiresIn: "10m",
+    });
+  }
+
   //register
-  static async register(account) {
-    const hashedPassword = await hashPassword(account.password);
+  static async register(input) {
+    const hashedPassword = await this.#hashPassword(input.password);
 
     const entity = new Account(
-      null,
-      account.name,
-      account.email,
+      input.id,
+      input.name,
+      input.email,
       hashedPassword
     );
 
-    const savedAccount = await AccountRepo.createAccount(entity);
-    console.log("auth_service:", savedAccount);
+    const account = await AccountRepo.create(entity);
+    console.log("[AuthService.register]:", account);
 
     const registeredUser = new Account(
-      savedAccount.user_id,
-      savedAccount.user_name,
-      savedAccount.user_email,
-      savedAccount.user_password
+      account.user_id,
+      account.user_name,
+      account.user_email,
+      account.user_password
     ).toDTO();
 
-    const accessToken = generateAccessToken(registeredUser);
-    const refreshToken = generateRefreshToken(registeredUser);
+    const accessToken = this.#generateAccessToken(registeredUser);
+    const refreshToken = this.#generateRefreshToken(registeredUser);
 
-    const savedSession = await SessionRepo.createSession(
+    const session = await SessionRepo.create(
       registeredUser.user_id,
       accessToken,
       refreshToken
@@ -43,71 +63,69 @@ export class AuthService {
 
     return {
       user: registeredUser,
-      session: savedSession,
+      session: session,
     };
   }
 
   //login
   static async login(account) {
-    const foundByEmail = await AccountRepo.findByEmail(account.email);
-    if (!foundByEmail) {
+    const foundAccount = await AccountRepo.findByEmail(account.email);
+    if (!foundAccount) {
       throw new Error("Invalid email or password");
     }
-    const passwordMatch = await verifyPassword(
+    const matched = await this.#verifyPassword(
       account.password,
-      foundByEmail.user_password
+      foundAccount.user_password
     );
-    if (!passwordMatch) {
+    if (!matched) {
       throw new Error("Invalid email or password");
     }
 
     const foundSession = await SessionRepo.findSessionByUserId(
-      foundByEmail.user_id
+      foundAccount.user_id
     );
 
     if (foundSession) {
-      await SessionRepo.deleteSessionByUserId(foundSession.user_id);
+      await SessionRepo.deleteByUserId(foundSession.user_id);
     }
 
-    const loggedUser = new Account(
-      foundByEmail.user_id,
-      foundByEmail.user_name,
-      foundByEmail.user_email,
-      foundByEmail.user_password
+    const loggedAccount = new Account(
+      foundAccount.user_id,
+      foundAccount.user_name,
+      foundAccount.user_email,
+      foundAccount.user_password
     ).toDTO();
 
-    const accessToken = generateAccessToken(loggedUser);
-    const refreshToken = generateRefreshToken(loggedUser);
+    const accessToken = this.#generateAccessToken(loggedAccount);
+    const refreshToken = this.#generateRefreshToken(loggedAccount);
 
-    const savedSession = await SessionRepo.createSession(
-      loggedUser.user_id,
+    const session = await SessionRepo.create(
+      loggedAccount.user_id,
       accessToken,
       refreshToken
     );
 
     return {
-      user: loggedUser,
-      session: savedSession,
+      user: loggedAccount,
+      session: session,
     };
   }
 
   //logout
   static async logout(user_id) {
-    const deletedSession = await SessionRepo.deleteSessionByUserId(user_id);
-    return deletedSession;
+    return SessionRepo.deleteByUserId(user_id)
   }
 
   //refresh
-  static async refreshTokens(user_id, oldRefreshToken) {
-    const foundSession = await SessionRepo.findSessionByUserId(user_id);
-    console.log(`[foundSession]: `, foundSession);
+  static async refreshTokens(user_id, refreshToken) {
+    const foundSession = await SessionRepo.findByUserId(user_id);
+    console.log("[AuthService.refhreshTokens.foundSession]: ", foundSession);
     if (!foundSession) {
       throw new Error("Session not found");
     }
-    console.log("[oldRefreshToken]: ", oldRefreshToken);
-    console.log("[REFRESH_SECRET_KEY]: ", process.env.REFRESH_SECRET_KEY);
+    console.log("[AuthService.refreshTokens]: ", refreshToken);
     try {
-      jwt.verify(oldRefreshToken, "" + process.env.REFRESH_SECRET_KEY, {
+      jwt.verify(refreshToken, "" + process.env.REFRESH_SECRET_KEY, {
         algorithms: ["HS256"],
       });
     } catch (error) {
@@ -121,8 +139,8 @@ export class AuthService {
       foundSession.refresh_token
     ).toDTO();
 
-    const newAccessToken = generateAccessToken(session);
-    const newRefreshToken = generateRefreshToken(session);
+    const newAccessToken = this.#generateAccessToken(session);
+    const newRefreshToken = this.#generateRefreshToken(session);
     console.log(newAccessToken);
     console.log(newRefreshToken);
 
@@ -137,7 +155,7 @@ export class AuthService {
 
   //update
   static async update(account) {
-    const hashedPassword = await hashPassword(account.user_password);
+    const hashedPassword = await this.#hashPassword(account.user_password);
 
     const entity = new Account(
       account.user_id,

@@ -14,9 +14,9 @@ export class AccountController {
     }
   }
 
-  static async findAllAccounts(req, res) {
+  static async findAll(req, res) {
     try {
-      const allAccounts = await AccountRepo.findAllAccounts();
+      const allAccounts = await AccountRepo.findAll();
       return res.status(200).json(allAccounts);
     } catch (error) {
       console.error("[AccountController.findAllAccounts]:", error);
@@ -37,7 +37,7 @@ export class AccountController {
   static async deleteOneAccount(req, res) {
     try {
       const { user_id } = req.params;
-      const deletedAccount = await AccountRepo.deleteOneAccount(user_id);
+      const deletedAccount = await AccountRepo.accountToDelete(user_id);
       return res.status(200).json(deletedAccount);
     } catch (error) {
       console.error("[AccountController.deleteOneAccount]:", error);
@@ -45,9 +45,9 @@ export class AccountController {
     }
   }
 
-  static async deleteAllAccounts(req, res) {
+  static async deleteAll(req, res) {
     try {
-      const deletedAccounts = await AccountRepo.deleteAllAccounts();
+      const deletedAccounts = await AccountRepo.deleteAll();
       return res.status(200).json(deletedAccounts);
     } catch (error) {
       console.error("[AccountController.deleteAllAccounts]:", error);
