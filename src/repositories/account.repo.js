@@ -2,15 +2,16 @@ import { pool } from "../config/db.js";
 import { Account } from "../models/account.model.js";
 
 export class AccountRepo {
-  static async createAccount(account) {
+  
+  static async create(account) {
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
       [account.user_name, account.user_email, account.user_password]
     );
     if (result.rows[0].length === 0) {
-      throw new Error("Unable to create new account");
+      return new Error("Failed to insert account");
     }
-    console.log("repo: ", account);
+    console.log("[AccountRepo.create]: ", account);
     return result.rows[0];
   }
 
@@ -20,8 +21,9 @@ export class AccountRepo {
       [id]
     );
     if (result.rows.length === 0) {
-      throw new Error("Cannot find account by id: " + id);
+      return new Error(`Failed to find account by id: ${id}`);
     }
+    console.log("[AccountRepo.findById]: ", id);
     return new Account(
       result.rows[0].user_id,
       result.rows[0].user_name,
@@ -36,25 +38,26 @@ export class AccountRepo {
       [email]
     );
     if (result.rows.length === 0) {
-      throw new Error("Incorrect email or password");
+      return undefined;
     }
+    console.log("[AccountRepo.findByEmail]: ", email);
     return result.rows[0];
   }
 
-  static async findAllAccounts() {
+  static async findAll() {
     const result = await pool.query(`SELECT * FROM accounts`);
     if (result.rows.length === 0) {
       return [];
     }
-    const allAccountsDTO = result.rows.map((account) =>
+    console.log("[AccountRepo.findAll]: ", result);
+    return result.rows.map((account) => {
       new Account(
         account.user_id,
         account.user_name,
         account.user_email,
         account.user_password
-      ).toDTO()
-    );
-    return allAccountsDTO;
+      ).toDTO();
+    });
   }
 
   static async updateAccount(account) {
@@ -69,34 +72,37 @@ export class AccountRepo {
     );
 
     if (result.rows[0] === undefined) {
-      throw new Error("Cannot update account by id: " + account.user_id);
+      return new Error(`Failed to update account by id: ${account.user_id}`);
     }
-
+    console.log("[AccountRepo.updateAccount]: ", account);
     return result.rows[0];
   }
 
-  static async deleteAllAccounts() {
+  static async deleteAll() {
     const result = await pool.query(`DELETE FROM accounts *`);
     if (result.rows.length === 0) {
       return [];
     }
+    console.log("[AccountRepo.deleteAll]: ", result);
     return result.rows;
   }
 
-  static async deleteOneAccount(id) {
+  static async accountToDelete(id) {
     const accountToDelete = await pool.query(
       `SELECT * FROM accounts WHERE user_id = $1`,
       [id]
     );
     if (accountToDelete.rows.length === 0) {
-      throw new Error("Cannot find account by id: " + id);
+      return new Error(`Filed to find account by id: ${id}`);
     }
-
     const result = await pool.query(
       `DELETE FROM accounts WHERE user_id = $1 RETURNING *`,
       [id]
     );
-
+    if (!result) {
+      return new Error(`Failed to delete account by id: ${id}`)
+    }
+    console.log("[AccountRepo.accountToDelete]: ", id);
     return new Account(
       result.rows[0].user_id,
       result.rows[0].user_name,

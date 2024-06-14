@@ -3,14 +3,13 @@ import { AuthService } from "../services/auth.service.js";
 export class AuthController {
   static async createAccount(req, res) {
     try {
-      const { user_name, user_email, user_password } = req.body;
-      const newAccount = await AuthService.register({
-        name: user_name,
-        email: user_email,
-        password: user_password,
+      const account = await AuthService.register({
+        name: req.body.user_name,
+        email: req.body.user_email,
+        password: req.body.user_password,
       });
-      console.log("controller: ", newAccount);
-      return res.status(200).json(newAccount);
+      console.log("[AuthController.createAccount]: successfully created account: ", account);
+      return res.status(200).json(account);
     } catch (error) {
       console.error("[AuthController.createAccount]:", error);
       return res.status(500).json({ error: error.message });
@@ -19,13 +18,12 @@ export class AuthController {
 
   static async login(req, res) {
     try {
-      const { user_email, user_password } = req.body;
-      const getTokensForUser = await AuthService.login({
-        email: user_email,
-        password: user_password,
+      const session = await AuthService.login({
+        email: req.body.user_email,
+        password: req.body.user_password,
       });
-
-      return res.status(200).json(getTokensForUser);
+      console.log("[AuthController.login]: successfully logged in: ", session);
+      return res.status(200).json(session);
     } catch (error) {
       console.error("[AuthController.login]:", error);
       return res.status(500).json({ error: error.message });
@@ -34,9 +32,9 @@ export class AuthController {
 
   static async logout(req, res) {
     try {
-      const { user_id } = req.body;
-      const loggedOutUser = await AuthService.logout(user_id);
-      return res.status(200).json(loggedOutUser);
+      const result = await AuthService.logout(req.body.user_id);
+      console.log("[AuthController.logout]: successfully logged out: ", result);
+      return res.status(200).json(result);
     } catch (error) {
       console.error("[AuthController.logout]:", error);
       return res.status(500).json({ error: error.message });
@@ -45,9 +43,9 @@ export class AuthController {
 
   static async refreshTokens(req, res) {
     try {
-      const { user_id, refresh_token } = req.body;
-      const newTokens = await AuthService.refreshTokens(user_id, refresh_token);
-      return res.status(200).json(newTokens);
+      const result = await AuthService.refreshTokens(req.body.user_id, req.body.refresh_token);
+      console.log("[AuthController.refreshTokens]: successfully refreshed: ", result);
+      return res.status(200).json(result);
     } catch (error) {
       console.error("[AuthController.refreshTokens]:", error);
       return res.status(500).json({ error: error.message });
