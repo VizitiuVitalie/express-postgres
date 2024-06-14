@@ -6,7 +6,6 @@ import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
 
 export class AuthService {
-
   //utils
   static #hashPassword(password) {
     const saltRounds = 10;
@@ -81,9 +80,7 @@ export class AuthService {
       throw new Error("Invalid email or password");
     }
 
-    const foundSession = await SessionRepo.findByUserId(
-      foundAccount.user_id
-    );
+    const foundSession = await SessionRepo.findByUserId(foundAccount.user_id);
 
     if (foundSession) {
       await SessionRepo.deleteAllByUserId(foundSession.user_id);
@@ -113,7 +110,7 @@ export class AuthService {
 
   //logout
   static async logout(user_id) {
-    return SessionRepo.deleteAllByUserId(user_id)
+    return SessionRepo.deleteAllByUserId(user_id);
   }
 
   //refresh
@@ -121,7 +118,7 @@ export class AuthService {
     const foundSession = await SessionRepo.findByUserId(user_id);
     console.log("[AuthService.refhreshTokens.foundSession]: ", foundSession);
     if (!foundSession) {
-      throw new Error("Session not found");
+      throw new Error(`Cannot find session by user id: ${user_id}`);
     }
     console.log("[AuthService.refreshTokens]: ", refreshToken);
     try {
