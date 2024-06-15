@@ -1,9 +1,9 @@
 export class Session {
-  constructor({ sessionId, userId, accessToken, refreshToken }) {
-    this.id = sessionId;
-    this.user_id = userId;
-    this.access_token = accessToken;
-    this.refresh_token = refreshToken;
+  constructor({ session_id, user_id, access_token, refresh_token }) {
+    this.id = session_id;
+    this.user_id = user_id;
+    this.access_token = access_token;
+    this.refresh_token = refresh_token;
   }
 
   toDTO() {

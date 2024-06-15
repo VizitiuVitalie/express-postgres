@@ -4,6 +4,7 @@ import { AccountRepo } from "../repositories/account.repo.js";
 import { SessionRepo } from "../repositories/session.repo.js";
 import { hash, compare } from "bcrypt";
 import jwt from "jsonwebtoken";
+const { sign } = jwt;
 
 export class AuthService {
   //utils
@@ -33,31 +34,30 @@ export class AuthService {
   //register
   static async register(input) {
     const hashedPassword = await this.#hashPassword(input.password);
-    const entity = new Account(
-      null,
-      input.name,
-      input.email,
-      hashedPassword
-    );
+    const entity = new Account({
+      name: input.name,
+      email: input.email,
+      password: hashedPassword,
+    });
 
     const account = await AccountRepo.create(entity);
     console.log("[AuthService.register]:", account);
 
-    const registeredUser = new Account(
-      account.id,
-      account.name,
-      account.email,
-      account.password
-    ).toDTO();
+    const registeredUser = new Account({
+      id: account.user_id,
+      name: account.user_name,
+      email: account.user_email,
+      password: account.user_password,
+    }).toDTO();
 
-    const accessToken = this.#generateAccessToken(registeredUser);
-    const refreshToken = this.#generateRefreshToken(registeredUser);
+    const accessToken = await this.#generateAccessToken(registeredUser);
+    const refreshToken = await this.#generateRefreshToken(registeredUser);
 
-    const session = await SessionRepo.create(
-      registeredUser.id,
-      accessToken,
-      refreshToken
-    );
+    const session = await SessionRepo.create({
+      user_id: registeredUser.id,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
 
     return {
       user: registeredUser,
@@ -69,7 +69,7 @@ export class AuthService {
   static async login(account) {
     const foundAccount = await AccountRepo.findByEmail(account.email);
     if (!foundAccount) {
-      throw new Error("Invalid email or password");
+      throw new Error("Account not found");
     }
     const matched = await this.#verifyPassword(
       account.password,
@@ -85,21 +85,21 @@ export class AuthService {
       await SessionRepo.deleteAllByUserId(foundSession.user_id);
     }
 
-    const loggedAccount = new Account(
-      foundAccount.user_id,
-      foundAccount.user_name,
-      foundAccount.user_email,
-      foundAccount.user_password
-    ).toDTO();
+    const loggedAccount = new Account({
+      id: foundAccount.user_id,
+      name: foundAccount.user_name,
+      email: foundAccount.user_email,
+      password: foundAccount.user_password,
+    }).toDTO();
 
-    const accessToken = this.#generateAccessToken(loggedAccount);
-    const refreshToken = this.#generateRefreshToken(loggedAccount);
+    const accessToken = await this.#generateAccessToken(loggedAccount);
+    const refreshToken = await this.#generateRefreshToken(loggedAccount);
 
-    const session = await SessionRepo.create(
-      loggedAccount.user_id,
-      accessToken,
-      refreshToken
-    );
+    const session = await SessionRepo.create({
+      user_id: loggedAccount.id,
+      access_token: accessToken,
+      refresh_token: refreshToken,
+    });
 
     return {
       user: loggedAccount,
@@ -113,38 +113,38 @@ export class AuthService {
   }
 
   //refresh
-  static async refreshTokens(user_id, refreshToken) {
+  static async refreshTokens(user_id, refresh_token) {
     const foundSession = await SessionRepo.findByUserId(user_id);
     console.log("[AuthService.refhreshTokens.foundSession]: ", foundSession);
     if (!foundSession) {
       throw new Error(`Cannot find session by user id: ${user_id}`);
     }
-    console.log("[AuthService.refreshTokens]: ", refreshToken);
+    console.log("[AuthService.refreshTokens]: ", refresh_token);
     try {
-      jwt.verify(refreshToken, "" + process.env.REFRESH_SECRET_KEY, {
+      jwt.verify(refresh_token, "" + process.env.REFRESH_SECRET_KEY, {
         algorithms: ["HS256"],
       });
     } catch (error) {
       throw new Error("Invalid refresh token");
     }
 
-    const session = new Session(
-      foundSession.session_id,
-      foundSession.user_id,
-      foundSession.access_token,
-      foundSession.refresh_token
-    ).toDTO();
+    const session = new Session({
+      id: foundSession.session_id,
+      user_id: foundSession.user_id,
+      access_token: foundSession.access_token,
+      refresh_token: foundSession.refresh_token,
+    }).toDTO();
 
-    const newAccessToken = this.#generateAccessToken(session);
-    const newRefreshToken = this.#generateRefreshToken(session);
+    const newAccessToken = await this.#generateAccessToken(session);
+    const newRefreshToken = await this.#generateRefreshToken(session);
     console.log(newAccessToken);
     console.log(newRefreshToken);
 
-    const updatedSession = await SessionRepo.updateSessionTokens(
-      user_id,
-      newAccessToken,
-      newRefreshToken
-    );
+    const updatedSession = await SessionRepo.updateTokens({
+      user_id: user_id,
+      access_token: newAccessToken,
+      refresh_token: newRefreshToken,
+    });
 
     return updatedSession;
   }

@@ -1,8 +1,6 @@
 export class Account {
   constructor({ id, name, email, password }) {
-    if (!id) {
-      this.id = id;
-    }
+    this.id = id || null;
     this.name = name;
     this.email = email;
     this.password = password;

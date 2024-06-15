@@ -2,13 +2,12 @@ import { pool } from "../config/db.js";
 import { Account } from "../models/account.model.js";
 
 export class AccountRepo {
-  
   static async create(account) {
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
       [account.name, account.email, account.password]
     );
-    if (result.rows[0].length === 0) {
+    if (result.rows.length === 0) {
       return new Error("Failed to insert account");
     }
     console.log("[AccountRepo.create]: ", account);
@@ -24,12 +23,12 @@ export class AccountRepo {
       return new Error(`Failed to find account by id: ${id}`);
     }
     console.log("[AccountRepo.findById]: ", id);
-    return new Account(
-      result.rows[0].user_id,
-      result.rows[0].user_name,
-      result.rows[0].user_email,
-      result.rows[0].user_password
-    ).toDTO();
+    return new Account({
+      id: result.rows[0].user_id,
+      name: result.rows[0].user_name,
+      email: result.rows[0].user_email,
+      password: result.rows[0].user_password,
+    }).toDTO();
   }
 
   static async findByEmail(email) {
@@ -100,7 +99,7 @@ export class AccountRepo {
       [id]
     );
     if (!result) {
-      return new Error(`Failed to delete account by id: ${id}`)
+      return new Error(`Failed to delete account by id: ${id}`);
     }
     console.log("[AccountRepo.accountToDelete]: ", id);
     return new Account(

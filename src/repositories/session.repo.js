@@ -1,8 +1,7 @@
 import { pool } from "../config/db.js";
 
 export class SessionRepo {
-
-  static async create(user_id, access_token, refresh_token) {
+  static async create({ user_id, access_token, refresh_token }) {
     const result = await pool.query(
       `INSERT INTO session_tokens (user_id, access_token, refresh_token) VALUES ($1, $2, $3) RETURNING *`,
       [user_id, access_token, refresh_token]
@@ -10,7 +9,11 @@ export class SessionRepo {
     if (result.rows[0].length === 0) {
       return new Error("Failed to create session");
     }
-    console.log("[SessionRepo.create]: ", { user_id, access_token, refresh_token });
+    console.log("[SessionRepo.create]: ", {
+      user_id,
+      access_token,
+      refresh_token,
+    });
     return result.rows[0];
   }
 
@@ -26,15 +29,19 @@ export class SessionRepo {
     return result.rows[0];
   }
 
-  static async update(user_id, accessToken, refreshToken) {
+  static async updateTokens({ user_id, access_token, refresh_token }) {
     const result = await pool.query(
       `UPDATE session_tokens SET access_token = $1, refresh_token = $2 WHERE user_id = $3 RETURNING *`,
-      [accessToken, refreshToken, user_id]
+      [access_token, refresh_token, user_id]
     );
     if (result.rows[0].length === 0) {
       return new Error("Failed to update tokens in session");
     }
-    console.log("[SessionRepo.update]: ", {user_id, accessToken, refreshToken});
+    console.log("[SessionRepo.update]: ", {
+      user_id,
+      access_token: access_token,
+      refresh_token: refresh_token,
+    });
     return result.rows[0];
   }
 
