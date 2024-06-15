@@ -6,7 +6,7 @@ export class AccountRepo {
   static async create(account) {
     const result = await pool.query(
       `INSERT INTO accounts (user_name, user_email, user_password) VALUES ($1, $2, $3) RETURNING *`,
-      [account.user_name, account.user_email, account.user_password]
+      [account.name, account.email, account.password]
     );
     if (result.rows[0].length === 0) {
       return new Error("Failed to insert account");

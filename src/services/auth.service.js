@@ -7,23 +7,23 @@ import jwt from "jsonwebtoken";
 
 export class AuthService {
   //utils
-  static #hashPassword(password) {
+  static async #hashPassword(password) {
     const saltRounds = 10;
     return hash(password, saltRounds);
   }
 
-  static #verifyPassword(password, hashedPassword) {
+  static async #verifyPassword(password, hashedPassword) {
     return compare(password, hashedPassword);
   }
 
-  static #generateAccessToken(user) {
+  static async #generateAccessToken(user) {
     return sign(user, `${process.env.ACCESS_SECRET_KEY}`, {
       algorithm: "HS256",
       expiresIn: "10m",
     });
   }
 
-  static #generateRefreshToken(user) {
+  static async #generateRefreshToken(user) {
     return sign(user, `${process.env.REFRESH_SECRET_KEY}`, {
       algorithm: "HS256",
       expiresIn: "10m",
@@ -33,9 +33,8 @@ export class AuthService {
   //register
   static async register(input) {
     const hashedPassword = await this.#hashPassword(input.password);
-
     const entity = new Account(
-      input.id,
+      null,
       input.name,
       input.email,
       hashedPassword
@@ -45,17 +44,17 @@ export class AuthService {
     console.log("[AuthService.register]:", account);
 
     const registeredUser = new Account(
-      account.user_id,
-      account.user_name,
-      account.user_email,
-      account.user_password
+      account.id,
+      account.name,
+      account.email,
+      account.password
     ).toDTO();
 
     const accessToken = this.#generateAccessToken(registeredUser);
     const refreshToken = this.#generateRefreshToken(registeredUser);
 
     const session = await SessionRepo.create(
-      registeredUser.user_id,
+      registeredUser.id,
       accessToken,
       refreshToken
     );
