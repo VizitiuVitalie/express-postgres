@@ -119,6 +119,9 @@ export class AuthService {
     if (!foundSession) {
       throw new Error(`Cannot find session by user id: ${user_id}`);
     }
+    if (refresh_token !== foundSession.refresh_token) {
+      throw new Error("Invalid refresh_token");
+    }
     console.log("[AuthService.refreshTokens]: ", refresh_token);
     try {
       jwt.verify(refresh_token, "" + process.env.REFRESH_SECRET_KEY, {
