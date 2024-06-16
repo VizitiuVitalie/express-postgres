@@ -89,8 +89,6 @@ RESTAPI_POSTGRES/
 ├── controllers/
 │   └── account.controller.js       // Retrieves data on request + error handling.
 │   └── auth.controller.js          // Only methods related to authentication (register, login, logout).
-├── jwt/
-│   └── jwt.js                      // Functions for generating access and refresh tokens.
 ├── middlewares/
 │   └── auth.middlewares.js         // Middleware for authenticating requests by checking the presence and validity of JWT tokens in HTTP request headers.
 ├── models/
@@ -104,9 +102,6 @@ RESTAPI_POSTGRES/
 │   └── auth.router.js              // Authentication routes (.post -> register; .get -> login).
 ├── services/
 │   └── auth.service.js             // Business logic layer (password hashing, account entity creation, token signature verification, etc.).
-├── utils/
-│   └── hashPassword.js             // Password hashing function.
-│   └── verifyPassword.js           // Function for comparing the entered password with the hashed password from the database for validation.
 ├── index.js                        // Main file.
 ├── .env                            // Contains secret keys for token generation and signing: ACCESS_SECRET_KEY, REFRESH_SECRET_KEY, as well as PORT and DB_PORT.
 
