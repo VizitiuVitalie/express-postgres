@@ -50,24 +50,19 @@ export class AccountRepo {
     }
     console.log("[AccountRepo.findAll]: ", result);
     return result.rows.map((account) => {
-      new Account(
-        account.user_id,
-        account.user_name,
-        account.user_email,
-        account.user_password
-      ).toDTO();
+      return new Account({
+        id: account.user_id,
+        name: account.user_name,
+        email: account.user_email,
+        password: account.user_password,
+      }).toDTO();
     });
   }
 
   static async updateAccount(account) {
     const result = await pool.query(
       `UPDATE accounts SET user_name = $1, user_email = $2, user_password = $3 WHERE user_id = $4 RETURNING *`,
-      [
-        account.user_name,
-        account.user_email,
-        account.user_password,
-        account.user_id,
-      ]
+      [account.name, account.email, account.password, account.id]
     );
 
     if (result.rows[0] === undefined) {
@@ -92,7 +87,7 @@ export class AccountRepo {
       [id]
     );
     if (account.rows.length === 0) {
-      return new Error(`Filed to find account by id: ${id}`);
+      return new Error(`Failed to find account by id: ${id}`);
     }
     const result = await pool.query(
       `DELETE FROM accounts WHERE user_id = $1 RETURNING *`,
@@ -102,11 +97,14 @@ export class AccountRepo {
       return new Error(`Failed to delete account by id: ${id}`);
     }
     console.log("[AccountRepo.accountToDelete]: ", id);
-    return new Account(
-      result.rows[0].user_id,
-      result.rows[0].user_name,
-      result.rows[0].user_email,
-      result.rows[0].user_password
-    ).toDTO();
+    return {
+      message: "successfully deleted: ",
+      account: new Account({
+        id: result.rows[0].user_id,
+        name: result.rows[0].user_name,
+        email: result.rows[0].user_email,
+        password: result.rows[0].user_password,
+      }).toDTO(),
+    };
   }
 }

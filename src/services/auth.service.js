@@ -27,7 +27,7 @@ export class AuthService {
   static async #generateRefreshToken(user) {
     return sign(user, `${process.env.REFRESH_SECRET_KEY}`, {
       algorithm: "HS256",
-      expiresIn: "10m",
+      expiresIn: "60m",
     });
   }
 
@@ -122,6 +122,10 @@ export class AuthService {
     if (refresh_token !== foundSession.refresh_token) {
       throw new Error("Invalid refresh_token");
     }
+    const decodedAccessToken = jwt.decode(foundSession.access_token);
+    if (decodedAccessToken.exp > Math.floor(Date.now() / 1000)) {
+      throw new Error("Your token is still valid");
+    }
     console.log("[AuthService.refreshTokens]: ", refresh_token);
     try {
       jwt.verify(refresh_token, "" + process.env.REFRESH_SECRET_KEY, {
@@ -140,8 +144,6 @@ export class AuthService {
 
     const newAccessToken = await this.#generateAccessToken(session);
     const newRefreshToken = await this.#generateRefreshToken(session);
-    console.log(newAccessToken);
-    console.log(newRefreshToken);
 
     const updatedSession = await SessionRepo.updateTokens({
       user_id: user_id,
@@ -156,19 +158,19 @@ export class AuthService {
   static async update(account) {
     const hashedPassword = await this.#hashPassword(account.user_password);
 
-    const entity = new Account(
-      account.user_id,
-      account.user_name,
-      account.user_email,
-      hashedPassword
-    );
-
+    const entity = new Account({
+      id: account.user_id,
+      name: account.user_name,
+      email: account.user_email,
+      password: hashedPassword,
+    });
+    console.log(entity);
     const updatedAccount = await AccountRepo.updateAccount(entity);
-    return new Account(
-      updatedAccount.user_id,
-      updatedAccount.user_name,
-      updatedAccount.user_email,
-      updatedAccount.user_password
-    ).toDTO();
+    return new Account({
+      id: updatedAccount.user_id,
+      name: updatedAccount.user_name,
+      email: updatedAccount.user_email,
+      password: updatedAccount.user_password,
+    }).toDTO();
   }
 }

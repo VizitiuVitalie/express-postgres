@@ -10,4 +10,4 @@ accountRouter.get("/:user_id", AccountController.findById);
 accountRouter.get("/", AccountController.findAll);
 accountRouter.put("/", AccountController.updateAccount);
 accountRouter.delete("/", AccountController.deleteAll);
-accountRouter.delete("/:user_id", AccountController.deleteOneAccount);
+accountRouter.delete("/:user_id", AccountController.accountToDelete);
