@@ -1,6 +1,6 @@
 # RESTful API with PostgreSQL and Node.js
 
-This project demonstrates how to build a RESTful API using Node.js and PostgreSQL, featuring user authentication and session management with JWT tokens.
+This project demonstrates how to build a RESTful API using Node.js, Express.js and PostgreSQL, featuring user authentication and session management with JWT tokens.
 
 ## Technologies Used
 
