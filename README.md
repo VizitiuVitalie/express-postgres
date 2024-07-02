@@ -5,6 +5,7 @@ This project demonstrates how to build a RESTful API using Node.js and PostgreSQ
 ## Technologies Used
 
 - **Node.js**
+- **Express.js**
 - **JWT**
 - **PostgreSQL**
 
